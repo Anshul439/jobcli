@@ -12,16 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const queue_1 = require("../queue");
 const router = (0, express_1.Router)();
-router.get('/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const job = yield queue_1.jobQueue.getJob(req.params.id);
     if (!job)
-        return res.status(404).json({ error: 'Job not found' });
+        return res.status(404).json({ error: "Job not found" });
     const state = yield job.getState();
     const attempts = job.attemptsMade;
     res.json({
         job_id: job.id,
         state,
-        attempts
+        attempts,
     });
 }));
 exports.default = router;
