@@ -27,7 +27,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const effectivePriority = orgPriorities[org_id] || orgPriorities.default;
     // prevent duplicate jobs
     const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-    const lock = yield redis.set(lockKey, 'locked', 'NX', 'EX', 30); // 30 sec lock
+    const lock = yield redis.set(lockKey, 'locked', 'EX', 30, 'NX');
     if (!lock) {
         console.log("Duplicate job detected");
         return res.status(409).json({ error: "Duplicate job already exists or was just submitted" });

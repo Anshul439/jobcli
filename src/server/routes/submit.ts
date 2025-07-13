@@ -22,7 +22,7 @@ router.post("/", async (req, res) => {
 
   // prevent duplicate jobs
   const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-  const lock = await redis.set(lockKey, 'locked', 'NX', 'EX', 30); // 30 sec lock
+const lock = await redis.set(lockKey, 'locked', 'EX', 30, 'NX');
 
   if (!lock) {
     console.log("Duplicate job detected");
