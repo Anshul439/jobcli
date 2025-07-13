@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { Command } from 'commander';
 import submitCommand from './commands/submit';
 import statusCommand from './commands/status';
