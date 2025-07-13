@@ -29,10 +29,9 @@ const worker = new bullmq_1.Worker("test-jobs", (job) => __awaiter(void 0, void 
     else {
         console.log(`[Worker] Skipping install for app version ${app_version_id}`);
     }
-    console.log(`🚀 Running test: ${job.data.test_path}`);
-    yield new Promise((res) => setTimeout(res, 10000));
-    if (Math.random() < 0.2)
-        throw new Error("❌ Simulated test failure");
+    console.log(`Running test: ${job.data.test_path}`);
+    yield new Promise((res) => setTimeout(res, 5000));
+    // if (Math.random() < 0.2) throw new Error("Simulated test failure");
 }), { connection });
-worker.on("completed", (job) => console.log(`✅ Job ${job.id} completed`));
-worker.on("failed", (job, err) => console.log(`❌ Job ${job === null || job === void 0 ? void 0 : job.id} failed: ${err.message}`));
+worker.on("completed", (job) => console.log(`Job ${job.id} completed`));
+worker.on("failed", (job, err) => console.log(`Job ${job === null || job === void 0 ? void 0 : job.id} failed: ${err.message}`));

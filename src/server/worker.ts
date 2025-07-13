@@ -27,15 +27,15 @@ const worker = new Worker(
       );
     }
 
-    console.log(`🚀 Running test: ${job.data.test_path}`);
-    await new Promise((res) => setTimeout(res, 10000));
+    console.log(`Running test: ${job.data.test_path}`);
+    await new Promise((res) => setTimeout(res, 5000));
 
-    if (Math.random() < 0.2) throw new Error("❌ Simulated test failure");
+    // if (Math.random() < 0.2) throw new Error("Simulated test failure");
   },
   { connection }
 );
 
-worker.on("completed", (job) => console.log(`✅ Job ${job.id} completed`));
+worker.on("completed", (job) => console.log(`Job ${job.id} completed`));
 worker.on("failed", (job, err) =>
-  console.log(`❌ Job ${job?.id} failed: ${err.message}`)
+  console.log(`Job ${job?.id} failed: ${err.message}`)
 );

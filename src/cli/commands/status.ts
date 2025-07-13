@@ -8,9 +8,9 @@ status
   .action(async (opts) => {
     try {
       const res = await axios.get(`http://localhost:3000/status/${opts.jobId}`);
-      console.log(`📦 Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
+      console.log(`Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
     } catch (err) {
-      console.error('❌ Error:', (err as any).message);
+      console.error('Error:', (err as any).message);
     }
   });
 

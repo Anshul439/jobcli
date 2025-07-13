@@ -15,7 +15,7 @@ submit
       test_path: opts.test,
       target: opts.target
     });
-    console.log('📤 Job submitted. ID:', res.data.job_id);
+    console.log('Job submitted. ID:', res.data.job_id);
   });
 
 export default submit;

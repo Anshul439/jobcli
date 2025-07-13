@@ -1,23 +1,57 @@
-import { Router } from 'express';
-import { jobQueue } from '../queue';
+import { Router } from "express";
+import { jobQueue } from "../queue";
+import IORedis from "ioredis";
 
+const redis = new IORedis();
 const router = Router();
 
-router.post('/', async (req, res) => {
-  const { org_id, app_version_id, test_path, priority = 1, target = 'emulator' } = req.body;
-
-  const job = await jobQueue.add('run-test', {
+router.post("/", async (req, res) => {
+  const {
     org_id,
     app_version_id,
     test_path,
-    priority,
     target
-  }, {
-    attempts: 3,
-    priority
-  });
+  } = req.body;
 
-  res.json({ job_id: job.id });
+  const orgPriorities: Record<string, number> = {
+    qualgent: 1,
+    internal: 2,
+    default: 5,
+  };
+  const effectivePriority = orgPriorities[org_id] || orgPriorities.default;
+
+  // prevent duplicate jobs
+  const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
+  const lock = await redis.set(lockKey, 'locked', 'NX', 'EX', 30); // 30 sec lock
+
+  if (!lock) {
+    console.log("Duplicate job detected");
+    return res.status(409).json({ error: "Duplicate job already exists or was just submitted" });
+  }
+
+  try {
+    const job = await jobQueue.add(
+      "run-test",
+      {
+        org_id,
+        app_version_id,
+        test_path,
+        target,
+        priority: effectivePriority,
+      },
+      {
+        attempts: 3,
+        priority: effectivePriority
+      }
+    );
+
+    res.json({ job_id: job.id });
+  } catch (err) {
+    // Clean up Redis lock if job fails to queue
+    await redis.del(lockKey);
+    console.error("Failed to add job:", err.message);
+    res.status(500).json({ error: "Failed to queue job" });
+  }
 });
 
 export default router;

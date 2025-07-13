@@ -20,10 +20,10 @@ status
     .action((opts) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const res = yield axios_1.default.get(`http://localhost:3000/status/${opts.jobId}`);
-        console.log(`📦 Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
+        console.log(`Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
     }
     catch (err) {
-        console.error('❌ Error:', err.message);
+        console.error('Error:', err.message);
     }
 }));
 exports.default = status;
