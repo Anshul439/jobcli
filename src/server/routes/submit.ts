@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { jobQueue } from "../queue";
 import IORedis from "ioredis";
+import { JobData } from "../../types/job";
 
 const redis = new IORedis();
 const router = Router();
@@ -11,7 +12,7 @@ router.post("/", async (req, res) => {
     app_version_id,
     test_path,
     target
-  } = req.body;
+  } = req.body as JobData;
 
   const orgPriorities: Record<string, number> = {
     qualgent: 1,
@@ -49,7 +50,7 @@ const lock = await redis.set(lockKey, 'locked', 'EX', 30, 'NX');
   } catch (err) {
     // Clean up Redis lock if job fails to queue
     await redis.del(lockKey);
-    console.error("Failed to add job:", err.message);
+    console.error("Failed to add job:", (err as any).message);
     res.status(500).json({ error: "Failed to queue job" });
   }
 });

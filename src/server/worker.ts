@@ -1,11 +1,12 @@
 import { Worker } from "bullmq";
 import IORedis from "ioredis";
+import { JobData } from "../types/job";
 
 const redis = new IORedis();
 
 const connection = new IORedis({ maxRetriesPerRequest: null });
 
-const worker = new Worker(
+const worker = new Worker<JobData>(
   "test-jobs",
   async (job) => {
     const { app_version_id } = job.data;

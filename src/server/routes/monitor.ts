@@ -1,24 +1,25 @@
 import { Router } from "express";
 import { jobQueue } from "../queue";
+import { QueuedJob, JobSummary } from "../../types/job";
 
 const router = Router();
 
-router.get('/jobs/summary', async (_, res) => {
-  const counts = {
+router.get("/jobs/summary", async (_, res) => {
+  const counts: JobSummary = {
     waiting: await jobQueue.getPrioritizedCount(),
     active: await jobQueue.getActiveCount(),
     completed: await jobQueue.getCompletedCount(),
-    failed: await jobQueue.getFailedCount()
+    failed: await jobQueue.getFailedCount(),
   };
   res.json(counts);
 });
 
-router.get('/jobs/queue', async (_, res) => {
+router.get("/jobs/queue", async (_, res) => {
   const waitingJobs = await jobQueue.getPrioritized(0, -1);
   const activeJobs = await jobQueue.getActive(0, -1);
   const delayedJobs = await jobQueue.getDelayed(0, -1);
 
-  const formatJob = (job: any, state: string) => ({
+  const formatJob = (job: any, state: string): QueuedJob => ({
     id: job.id,
     org_id: job.data.org_id,
     test_path: job.data.test_path,
@@ -26,13 +27,13 @@ router.get('/jobs/queue', async (_, res) => {
     priority: job.opts.priority,
     state,
     attemptsMade: job.attemptsMade,
-    timestamp: job.timestamp
+    timestamp: job.timestamp,
   });
 
   const jobs = [
-    ...activeJobs.map((j) => formatJob(j, 'active')),
-    ...waitingJobs.map((j) => formatJob(j, 'waiting')),
-    ...delayedJobs.map((j) => formatJob(j, 'delayed'))
+    ...activeJobs.map((j) => formatJob(j, "active")),
+    ...waitingJobs.map((j) => formatJob(j, "waiting")),
+    ...delayedJobs.map((j) => formatJob(j, "delayed")),
   ];
 
   // Sort by priority (asc), then timestamp (asc)
@@ -45,6 +46,5 @@ router.get('/jobs/queue', async (_, res) => {
 
   res.json(jobs);
 });
-
 
 export default router;

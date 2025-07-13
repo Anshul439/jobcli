@@ -12,16 +12,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const queue_1 = require("../queue");
 const router = (0, express_1.Router)();
-router.get('/jobs/summary', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/jobs/summary", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const counts = {
         waiting: yield queue_1.jobQueue.getPrioritizedCount(),
         active: yield queue_1.jobQueue.getActiveCount(),
         completed: yield queue_1.jobQueue.getCompletedCount(),
-        failed: yield queue_1.jobQueue.getFailedCount()
+        failed: yield queue_1.jobQueue.getFailedCount(),
     };
     res.json(counts);
 }));
-router.get('/jobs/queue', (_, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/jobs/queue", (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const waitingJobs = yield queue_1.jobQueue.getPrioritized(0, -1);
     const activeJobs = yield queue_1.jobQueue.getActive(0, -1);
     const delayedJobs = yield queue_1.jobQueue.getDelayed(0, -1);
@@ -33,12 +33,12 @@ router.get('/jobs/queue', (_, res) => __awaiter(void 0, void 0, void 0, function
         priority: job.opts.priority,
         state,
         attemptsMade: job.attemptsMade,
-        timestamp: job.timestamp
+        timestamp: job.timestamp,
     });
     const jobs = [
-        ...activeJobs.map((j) => formatJob(j, 'active')),
-        ...waitingJobs.map((j) => formatJob(j, 'waiting')),
-        ...delayedJobs.map((j) => formatJob(j, 'delayed'))
+        ...activeJobs.map((j) => formatJob(j, "active")),
+        ...waitingJobs.map((j) => formatJob(j, "waiting")),
+        ...delayedJobs.map((j) => formatJob(j, "delayed")),
     ];
     // Sort by priority (asc), then timestamp (asc)
     jobs.sort((a, b) => {
