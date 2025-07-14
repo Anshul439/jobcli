@@ -6,10 +6,10 @@
   "scripts": {
     "dev": "concurrently \"tsc -w\" \"nodemon dist/server/index.js\"",
     "worker": "concurrently \"tsc -w\" \"nodemon dist/server/worker.js\"",
-    "cli": "ts-node src/cli/index.ts",
     "build": "tsc",
-    "start": "node dist/server/index.js",
-    "start:worker": "node dist/server/worker.js"
+    "worker:device": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=device nodemon dist/server/worker.js\"",
+    "worker:emulator": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=emulator nodemon dist/server/worker.js\"",
+    "worker:browserstack": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=browserstack nodemon dist/server/worker.js\""
   },
   "keywords": [],
   "author": "",
@@ -27,6 +27,7 @@
     "@types/concurrently": "^7.0.3",
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.13",
+    "cross-env": "^7.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

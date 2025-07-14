@@ -7,12 +7,20 @@ const redis = new IORedis();
 const router = Router();
 
 router.post("/", async (req, res) => {
-  const {
-    org_id,
-    app_version_id,
-    test_path,
-    target
-  } = req.body as JobData;
+  const { org_id, app_version_id, test_path, target } = req.body as JobData;
+
+  const activeTargets = await redis.smembers("active_targets");
+  console.log(activeTargets);
+  
+
+  if (!activeTargets.includes(target)) {
+    return res.status(400).json({
+      error: `No active worker available for target "${target}". Available: ${activeTargets.join(
+        ", "
+      )}`,
+    });
+    console.log(activeTargets);
+  }
 
   const orgPriorities: Record<string, number> = {
     qualgent: 1,
@@ -23,11 +31,13 @@ router.post("/", async (req, res) => {
 
   // prevent duplicate jobs
   const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-const lock = await redis.set(lockKey, 'locked', 'EX', 30, 'NX');
+  const lock = await redis.set(lockKey, "locked", "EX", 30, "NX");
 
   if (!lock) {
     console.log("Duplicate job detected");
-    return res.status(409).json({ error: "Duplicate job already exists or was just submitted" });
+    return res
+      .status(409)
+      .json({ error: "Duplicate job already exists or was just submitted" });
   }
 
   try {
@@ -42,7 +52,7 @@ const lock = await redis.set(lockKey, 'locked', 'EX', 30, 'NX');
       },
       {
         attempts: 3,
-        priority: effectivePriority
+        priority: effectivePriority,
       }
     );
 
