@@ -4,7 +4,7 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 
 ## Architecture Overview
 
-<img src="images/new-diagram.png" width="600" />
+<img src="images/new-diagram.png" width="800" />
 
 ## Key Features
 
