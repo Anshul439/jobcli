@@ -4,6 +4,8 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 
 ## Architecture Overview
 
+<img src="images/new-diagram.png" width="600" />
+
 ## Key Features
 
 ### 🚀 **Efficient Job Grouping**
@@ -32,29 +34,6 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 - Real-time job status tracking
 - Queue monitoring endpoints
 - Detailed job execution logs
-
-## Project Structure
-
-├── src/
-│ ├── cli/ # CLI tool implementation
-│ │ ├── commands/
-│ │ │ ├── submit.ts # Submit job command
-│ │ │ └── status.ts # Check job status
-│ │ └── index.ts # CLI entry point
-│ ├── server/ # Backend server
-│ │ ├── routes/
-│ │ │ ├── submit.ts # Job submission API
-│ │ │ ├── status.ts # Job status API
-│ │ │ └── monitor.ts # Queue monitoring API
-│ │ ├── utils/
-│ │ │ └── redis.ts # Redis connection
-│ │ ├── index.ts # Server entry point
-│ │ ├── queue.ts # BullMQ queue setup
-│ │ └── worker.ts # Job processing worker
-│ └── types/ # TypeScript type definitions
-├── .github/workflows/ # GitHub Actions integration
-├── dist/ # Compiled JavaScript
-└── README.md
 
 ## Setup Instructions
 
