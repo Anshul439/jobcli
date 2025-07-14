@@ -1,10 +1,8 @@
-import { Router } from "express";
+import { Request, Response } from "express";
 import { jobQueue } from "../queue";
 import { QueuedJob, JobSummary } from "../../types/job";
 
-const router = Router();
-
-router.get("/jobs/summary", async (_, res) => {
+export const getJobSummary = async (_: Request, res: Response) => {
   const counts: JobSummary = {
     waiting: await jobQueue.getPrioritizedCount(),
     active: await jobQueue.getActiveCount(),
@@ -12,9 +10,9 @@ router.get("/jobs/summary", async (_, res) => {
     failed: await jobQueue.getFailedCount(),
   };
   res.json(counts);
-});
+};
 
-router.get("/jobs/queue", async (_, res) => {
+export const getQueueDetails = async (_: Request, res: Response) => {
   const waitingJobs = await jobQueue.getPrioritized(0, -1);
   const activeJobs = await jobQueue.getActive(0, -1);
   const delayedJobs = await jobQueue.getDelayed(0, -1);
@@ -45,6 +43,4 @@ router.get("/jobs/queue", async (_, res) => {
   });
 
   res.json(jobs);
-});
-
-export default router;
+};

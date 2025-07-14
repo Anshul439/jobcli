@@ -1,7 +1,7 @@
 import express from 'express';
-import submitRoute from './routes/submit';
-import statusRoute from './routes/status';
-import monitorRoute from './routes/monitor';
+import submitRoute from './routes/submitRoute';
+import statusRoute from './routes/statusRoute';
+import monitorRoute from './routes/monitorRoute';
 
 const app = express();
 app.use(express.json());

@@ -1,9 +1,7 @@
-import { Router } from "express";
+import { Request, Response } from "express";
 import { jobQueue } from "../queue";
 
-const router = Router();
-
-router.get("/:id", async (req, res) => {
+export const getJobStatus = async (req: Request, res: Response) => {
   const job = await jobQueue.getJob(req.params.id);
   if (!job) return res.status(404).json({ error: "Job not found" });
 
@@ -15,6 +13,4 @@ router.get("/:id", async (req, res) => {
     state,
     attempts,
   });
-});
-
-export default router;
+};

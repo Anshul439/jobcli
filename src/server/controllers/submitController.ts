@@ -1,17 +1,15 @@
-import { Router } from "express";
+import { Request, Response } from "express";
+import redis from "../utils/redis";
 import { jobQueue } from "../queue";
 import { JobData } from "../../types/job";
-import redis from "../utils/redis";
 
 const connection = redis;
-const router = Router();
 
-router.post("/", async (req, res) => {
+export const submitJob = async (req: Request, res: Response) => {
   const { org_id, app_version_id, test_path, target } = req.body as JobData;
 
   const activeTargets = await connection.smembers("active_targets");
   console.log(activeTargets);
-  
 
   if (!activeTargets.includes(target)) {
     return res.status(400).json({
@@ -63,6 +61,4 @@ router.post("/", async (req, res) => {
     console.error("Failed to add job:", (err as any).message);
     res.status(500).json({ error: "Failed to queue job" });
   }
-});
-
-export default router;
+};

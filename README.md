@@ -187,24 +187,7 @@ GET /monitor/jobs/queue      # Get detailed queue information
 
 ### 4. Job Processing Flow
 
-1. Job Submission
-
-Jobs are submitted with app_version_id, test_path, and target
-Redis lock prevents duplicate submissions: joblock:{org_id}:{app_version_id}:{test_path}:{target}
-Jobs are queued with organization-based priority
-
-2. Target-Based Worker Assignment
-
-Workers register their target type in Redis set: active_targets
-Jobs are only processed by workers matching the target type
-If no worker is available for target, submission fails immediately
-
-3. App Version Grouping
-
-Before running tests, workers check if app_version_id is installed
-Redis set installed_versions tracks installed app versions per worker
-First job for an app version triggers installation (simulated 1s delay)
-Subsequent jobs for same version skip installation
+Job Submitted → Queue (Priority) → Worker Match → Install Check → Test Execution → Cleanup
 
 ## GitHub Actions Integration
 
@@ -252,13 +235,10 @@ pnpm worker:browserstack
 ```bash
 # Submit jobs for same app version (will group installations)
 qgjob submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
-
 qgjob submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
 
 # Submit job for different app versions
-
 qgjob submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=device
-
 qgjob submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=browserstack
 ```
 
