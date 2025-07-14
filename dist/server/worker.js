@@ -23,12 +23,28 @@ if (!AGENT_TARGET ||
     process.exit(1);
 }
 console.log(`Starting worker for target: ${AGENT_TARGET}`);
-(() => __awaiter(void 0, void 0, void 0, function* () {
+const registerTarget = () => __awaiter(void 0, void 0, void 0, function* () {
     yield redis_1.default.sadd("active_targets", AGENT_TARGET);
     console.log(`Registered "${AGENT_TARGET}" in active_targets`);
+});
+const deregisterTarget = () => __awaiter(void 0, void 0, void 0, function* () {
+    yield redis_1.default.srem("active_targets", AGENT_TARGET);
+    console.log(`Deregistered "${AGENT_TARGET}" from active_targets`);
+});
+// Register the worker
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    yield registerTarget();
 }))();
+const gracefulShutdown = (signal) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(`\nReceived ${signal}, shutting down worker...`);
+    yield worker.close();
+    yield deregisterTarget();
+    process.exit(0);
+});
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
 const worker = new bullmq_1.Worker("test-jobs", (job) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("HIII");
     if (job.data.target !== AGENT_TARGET) {
         console.log(`Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`);
         throw new Error("Target mismatch");

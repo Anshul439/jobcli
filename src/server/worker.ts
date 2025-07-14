@@ -16,16 +16,35 @@ if (
 
 console.log(`Starting worker for target: ${AGENT_TARGET}`);
 
-(async () => {
+const registerTarget = async () => {
   await redis.sadd("active_targets", AGENT_TARGET);
   console.log(`Registered "${AGENT_TARGET}" in active_targets`);
+};
+
+const deregisterTarget = async () => {
+  await redis.srem("active_targets", AGENT_TARGET);
+  console.log(`Deregistered "${AGENT_TARGET}" from active_targets`);
+};
+
+// Register the worker
+(async () => {
+  await registerTarget();
 })();
+
+const gracefulShutdown = async (signal: string) => {
+  console.log(`\nReceived ${signal}, shutting down worker...`);
+  await worker.close();
+  await deregisterTarget();
+  process.exit(0);
+};
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
 
 const worker = new Worker(
   "test-jobs",
   async (job) => {
-    console.log("HIII");
-
     if (job.data.target !== AGENT_TARGET) {
       console.log(
         `Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`
