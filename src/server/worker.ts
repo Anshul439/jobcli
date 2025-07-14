@@ -1,41 +1,44 @@
-// console.log("👷‍♂️ Worker booting...");
-// console.log("AGENT_TARGET =", process.env.AGENT_TARGET);
-
 import { Worker } from "bullmq";
-import IORedis from "ioredis";
-import { JobData } from "../types/job";
+import redis from "./utils/redis";
 
-const redis = new IORedis();
-const connection = new IORedis({ maxRetriesPerRequest: null });
+const connection = redis;
 
 const AGENT_TARGET = process.env.AGENT_TARGET;
 console.log(AGENT_TARGET);
 
-
-if (!AGENT_TARGET || !['emulator', 'device', 'browserstack'].includes(AGENT_TARGET)) {
+if (
+  !AGENT_TARGET ||
+  !["emulator", "device", "browserstack"].includes(AGENT_TARGET)
+) {
   console.error("AGENT_TARGET must be one of: emulator, device, browserstack");
   process.exit(1);
 }
 
 console.log(`Starting worker for target: ${AGENT_TARGET}`);
 
+(async () => {
+  await redis.sadd("active_targets", AGENT_TARGET);
+  console.log(`Registered "${AGENT_TARGET}" in active_targets`);
+})();
+
 const worker = new Worker(
   "test-jobs",
   async (job) => {
     console.log("HIII");
-    
-    if (job.data.target !== AGENT_TARGET) {
-      console.log(`Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`);
-      throw new Error('Target mismatch');
-    }
 
-    await redis.sadd("active_targets", AGENT_TARGET);
-    console.log(AGENT_TARGET);
-    
+    if (job.data.target !== AGENT_TARGET) {
+      console.log(
+        `Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`
+      );
+      throw new Error("Target mismatch");
+    }
 
     const { org_id, app_version_id, test_path, target } = job.data;
 
-    const isInstalled = await redis.sismember("installed_versions", app_version_id);
+    const isInstalled = await redis.sismember(
+      "installed_versions",
+      app_version_id
+    );
     if (!isInstalled) {
       console.log(`[${AGENT_TARGET}] Installing ${app_version_id}`);
       await new Promise((r) => setTimeout(r, 1000));
@@ -47,7 +50,7 @@ const worker = new Worker(
   },
   {
     connection,
-    concurrency: 1
+    concurrency: 1,
   }
 );
 
@@ -60,10 +63,5 @@ worker.on("completed", async (job) => {
 });
 
 worker.on("failed", async (job, err) => {
-  const { org_id, app_version_id, test_path, target } = job.data;
-  const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-  await redis.del(lockKey);
-
   console.log(`[${AGENT_TARGET}] Job ${job?.id} failed: ${err.message}`);
 });
-

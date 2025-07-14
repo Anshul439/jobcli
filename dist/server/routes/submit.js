@@ -14,12 +14,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const queue_1 = require("../queue");
-const ioredis_1 = __importDefault(require("ioredis"));
-const redis = new ioredis_1.default();
+const redis_1 = __importDefault(require("../utils/redis"));
+const connection = redis_1.default;
 const router = (0, express_1.Router)();
 router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { org_id, app_version_id, test_path, target } = req.body;
-    const activeTargets = yield redis.smembers("active_targets");
+    const activeTargets = yield connection.smembers("active_targets");
     console.log(activeTargets);
     if (!activeTargets.includes(target)) {
         return res.status(400).json({
@@ -35,7 +35,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const effectivePriority = orgPriorities[org_id] || orgPriorities.default;
     // prevent duplicate jobs
     const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-    const lock = yield redis.set(lockKey, "locked", "EX", 30, "NX");
+    const lock = yield connection.set(lockKey, "locked", "EX", 30, "NX");
     if (!lock) {
         console.log("Duplicate job detected");
         return res
@@ -57,7 +57,7 @@ router.post("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (err) {
         // Clean up Redis lock if job fails to queue
-        yield redis.del(lockKey);
+        yield connection.del(lockKey);
         console.error("Failed to add job:", err.message);
         res.status(500).json({ error: "Failed to queue job" });
     }
