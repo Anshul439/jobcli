@@ -1,4 +1,4 @@
-# QualGent Backend Coding Challenge
+# Backend Coding Challenge
 
 A CLI tool and backend service for queuing, grouping, and deploying AppWright tests across local devices, emulators, and BrowserStack with GitHub Actions integration.
 
@@ -8,28 +8,28 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 
 ## Key Features
 
-### 🚀 **Efficient Job Grouping**
+### **Efficient Job Grouping**
 
 - Jobs with the same `app_version_id` are grouped to minimize app installations
 - Redis tracks installed versions per worker to avoid redundant installs
 
-### 🎯 **Smart Target Assignment**
+### **Smart Target Assignment**
 
 - Workers register their target type (emulator/device/browserstack) in Redis
 - Jobs are only assigned to workers with matching target capabilities
 
-### 🔄 **Reliability & Fault Tolerance**
+### **Reliability & Fault Tolerance**
 
 - Automatic job retries (3 attempts by default)
 - Job deduplication using Redis locks
 - Crash recovery through persistent Redis queue
 
-### 📊 **Priority System**
+### **Priority System**
 
 - Organization-based priority: `qualgent` (1) > `internal` (2) > `default` (5)
 - Jobs processed in priority order within each target type
 
-### 🔍 **Monitoring**
+### **Monitoring**
 
 - Real-time job status tracking
 - Queue monitoring endpoints
