@@ -1,4 +1,4 @@
-name: QualGent End-to-End Test
+name: End-to-End Test
 
 on:
   push:
@@ -37,7 +37,7 @@ jobs:
       - name: Start server & worker in background
         run: |
           nohup node dist/server/index.js > server.log 2>&1 &
-          nohup node dist/server/worker.js > worker.log 2>&1 &
+          nohup env AGENT_TARGET=emulator node dist/server/worker.js > worker.log 2>&1 &
           sleep 5
 
       - name: Submit test via CLI
@@ -58,5 +58,5 @@ jobs:
           if [[ "$STATUS" == "failed" ]]; then exit 1; fi
           sleep 3
           done
-          echo "❌ Timed out waiting for job to complete"
+          echo "Timed out waiting for job to complete"
           exit 1
