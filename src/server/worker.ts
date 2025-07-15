@@ -49,8 +49,8 @@ const worker = new Worker(
       console.log(
         `Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`
       );
-      throw new Error("Target mismatch");
     }
+      console.log(`[${AGENT_TARGET}] Processing job: ${job.id}`);
 
     const { org_id, app_version_id, test_path, target } = job.data;
 
@@ -65,7 +65,7 @@ const worker = new Worker(
     }
 
     console.log(`[${AGENT_TARGET}] Running ${test_path}`);
-    await new Promise((res) => setTimeout(res, 5000));
+    await new Promise((res) => setTimeout(res, 20000));
   },
   {
     connection,
@@ -74,13 +74,29 @@ const worker = new Worker(
 );
 
 worker.on("completed", async (job) => {
+  // Only handle events for jobs that match this worker's target
+  if (job.data.target !== AGENT_TARGET) {
+    return;
+  }
+
+  console.log("HIIIII");
   const { org_id, app_version_id, test_path, target } = job.data;
   const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
   await redis.del(lockKey);
 
   console.log(`[${AGENT_TARGET}] Job ${job.id} completed`);
+  console.log("HIIIII");
 });
 
 worker.on("failed", async (job, err) => {
+  // Only handle events for jobs that match this worker's target
+  if (job?.data?.target !== AGENT_TARGET) {
+    return;
+  }
+
+  console.log("BYEEEE");
+  
+  const { org_id, app_version_id, test_path, target } = job.data;
+
   console.log(`[${AGENT_TARGET}] Job ${job?.id} failed: ${err.message}`);
 });

@@ -9,7 +9,8 @@
     "build": "tsc",
     "worker:device": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=device nodemon dist/server/worker.js\"",
     "worker:emulator": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=emulator nodemon dist/server/worker.js\"",
-    "worker:browserstack": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=browserstack nodemon dist/server/worker.js\""
+    "worker:browserstack": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=browserstack nodemon dist/server/worker.js\"",
+    "redis:reset": "docker exec -it redis-qgjob  redis-cli FLUSHALL"
   },
   "keywords": [],
   "author": "",
