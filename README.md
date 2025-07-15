@@ -48,8 +48,8 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 1. **Clone the repository:**
 
 ```bash
-git clone <repository-url>
-cd qualgent-backend-challenge
+git clone https://github.com/Anshul439/qgjob
+cd cd qgjob
 ```
 
 2. **Install dependencies:**
