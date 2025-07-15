@@ -51,13 +51,16 @@ jobs:
         run: |
           job_id=${{ steps.submit.outputs.job_id }}
           echo "Polling job ID: $job_id"
-          for i in {1..10}; do
-          RESPONSE=$(curl -s "http://localhost:3000/status?id=$job_id&target=emulator")
+          for i in {1..15}; do
+          RESPONSE=$(curl -s "http://localhost:3000/status/$job_id?target=emulator")
           echo "Attempt $i: Response = $RESPONSE"
-          STATUS=$(echo "$RESPONSE" | jq -r '.state')
+          
+          STATUS=$(echo "$RESPONSE" | jq -r '.state // "unknown"')
           echo "Attempt $i: Job status = $STATUS"
+          
           if [[ "$STATUS" == "completed" ]]; then exit 0; fi
           if [[ "$STATUS" == "failed" ]]; then exit 1; fi
+          
           sleep 3
           done
           echo "Timed out waiting for job to complete"

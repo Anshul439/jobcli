@@ -19,17 +19,24 @@ status
     .requiredOption("--job-id <job_id>", "Job ID to check")
     .requiredOption("--target <target>", "Target device")
     .action((opts) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
-        const res = yield axios_1.default.get(`http://localhost:3000/status`, {
+        const res = yield axios_1.default.get(`http://localhost:3000/status/${opts.jobId}`, {
             params: {
-                id: opts.jobId,
                 target: opts.target,
             },
         });
-        console.log(`Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
+        const { state, attempts } = res.data;
+        console.log(`Job Status: ${state} (Attempts: ${attempts})`);
     }
     catch (err) {
-        console.error("Error:", err.message);
+        if (((_a = err.response) === null || _a === void 0 ? void 0 : _a.status) === 404) {
+            console.error(`Job ${opts.jobId} not found on target "${opts.target}"`);
+        }
+        else {
+            console.error("Error:", err.message);
+        }
+        process.exit(1);
     }
 }));
 exports.default = status;

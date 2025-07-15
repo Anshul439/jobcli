@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { getTargetQueue } from "../queue";
 
 export const getJobStatus = async (req: Request, res: Response) => {
-  const { id, target } = req.query;
+  const { id } = req.params;
+  const { target } = req.query;
 
   if (!target || typeof target !== "string") {
     return res

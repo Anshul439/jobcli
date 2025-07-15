@@ -12,7 +12,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getJobStatus = void 0;
 const queue_1 = require("../queue");
 const getJobStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id, target } = req.query;
+    const { id } = req.params;
+    const { target } = req.query;
     if (!target || typeof target !== "string") {
         return res
             .status(400)
