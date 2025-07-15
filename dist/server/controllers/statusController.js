@@ -12,15 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getJobStatus = void 0;
 const queue_1 = require("../queue");
 const getJobStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const job = yield queue_1.jobQueue.getJob(req.params.id);
+    const { id, target } = req.query;
+    if (!target || typeof target !== "string") {
+        return res
+            .status(400)
+            .json({ error: "Target is required to locate the job" });
+    }
+    const queue = (0, queue_1.getTargetQueue)(target);
+    const job = yield queue.getJob(id);
     if (!job)
         return res.status(404).json({ error: "Job not found" });
     const state = yield job.getState();
     const attempts = job.attemptsMade;
-    res.json({
-        job_id: job.id,
-        state,
-        attempts,
-    });
+    res.json({ job_id: job.id, state, attempts });
 });
 exports.getJobStatus = getJobStatus;

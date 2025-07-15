@@ -4,4 +4,6 @@ import redis from './utils/redis';
 
 const connection = redis;
 
-export const jobQueue = new Queue<JobData>('test-jobs', { connection });
+export const getTargetQueue = (target: string) => {
+  return new Queue<JobData>(`test-jobs-${target}`, { connection });
+};

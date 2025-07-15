@@ -11,20 +11,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getQueueDetails = exports.getJobSummary = void 0;
 const queue_1 = require("../queue");
+const targets = ["device", "emulator", "browserstack"];
 const getJobSummary = (_, res) => __awaiter(void 0, void 0, void 0, function* () {
     const counts = {
-        waiting: yield queue_1.jobQueue.getPrioritizedCount(),
-        active: yield queue_1.jobQueue.getActiveCount(),
-        completed: yield queue_1.jobQueue.getCompletedCount(),
-        failed: yield queue_1.jobQueue.getFailedCount(),
+        waiting: 0,
+        active: 0,
+        completed: 0,
+        failed: 0,
     };
+    for (const target of targets) {
+        const queue = (0, queue_1.getTargetQueue)(target);
+        counts.waiting += yield queue.getPrioritizedCount();
+        counts.active += yield queue.getActiveCount();
+        counts.completed += yield queue.getCompletedCount();
+        counts.failed += yield queue.getFailedCount();
+    }
     res.json(counts);
 });
 exports.getJobSummary = getJobSummary;
 const getQueueDetails = (_, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const waitingJobs = yield queue_1.jobQueue.getPrioritized(0, -1);
-    const activeJobs = yield queue_1.jobQueue.getActive(0, -1);
-    const delayedJobs = yield queue_1.jobQueue.getDelayed(0, -1);
+    const jobs = [];
     const formatJob = (job, state) => ({
         id: job.id,
         org_id: job.data.org_id,
@@ -35,11 +41,13 @@ const getQueueDetails = (_, res) => __awaiter(void 0, void 0, void 0, function* 
         attemptsMade: job.attemptsMade,
         timestamp: job.timestamp,
     });
-    const jobs = [
-        ...activeJobs.map((j) => formatJob(j, "active")),
-        ...waitingJobs.map((j) => formatJob(j, "waiting")),
-        ...delayedJobs.map((j) => formatJob(j, "delayed")),
-    ];
+    for (const target of targets) {
+        const queue = (0, queue_1.getTargetQueue)(target);
+        const activeJobs = yield queue.getActive(0, -1);
+        const waitingJobs = yield queue.getPrioritized(0, -1);
+        const delayedJobs = yield queue.getDelayed(0, -1);
+        jobs.push(...activeJobs.map((j) => formatJob(j, "active")), ...waitingJobs.map((j) => formatJob(j, "waiting")), ...delayedJobs.map((j) => formatJob(j, "delayed")));
+    }
     // Sort by priority (asc), then timestamp (asc)
     jobs.sort((a, b) => {
         if (a.priority === b.priority) {

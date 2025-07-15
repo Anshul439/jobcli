@@ -14,16 +14,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const axios_1 = __importDefault(require("axios"));
-const status = new commander_1.Command('status');
+const status = new commander_1.Command("status");
 status
-    .requiredOption('--job-id <job_id>', 'Job ID to check')
+    .requiredOption("--job-id <job_id>", "Job ID to check")
+    .requiredOption("--target <target>", "Target device")
     .action((opts) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const res = yield axios_1.default.get(`http://localhost:3000/status/${opts.jobId}`);
+        const res = yield axios_1.default.get(`http://localhost:3000/status`, {
+            params: {
+                id: opts.jobId,
+                target: opts.target,
+            },
+        });
         console.log(`Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
     }
     catch (err) {
-        console.error('Error:', err.message);
+        console.error("Error:", err.message);
     }
 }));
 exports.default = status;

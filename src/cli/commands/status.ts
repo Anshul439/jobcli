@@ -1,17 +1,25 @@
-import { Command } from 'commander';
-import axios from 'axios';
-import { StatusOptions } from '../../types/cli';
+import { Command } from "commander";
+import axios from "axios";
+import { StatusOptions } from "../../types/cli";
 
-const status = new Command('status');
+const status = new Command("status");
 
 status
-  .requiredOption('--job-id <job_id>', 'Job ID to check')
-  .action(async (opts: StatusOptions ) => {
+  .requiredOption("--job-id <job_id>", "Job ID to check")
+  .requiredOption("--target <target>", "Target device")
+  .action(async (opts: StatusOptions) => {
     try {
-      const res = await axios.get(`http://localhost:3000/status/${opts.jobId}`);
-      console.log(`Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`);
+      const res = await axios.get(`http://localhost:3000/status`, {
+        params: {
+          id: opts.jobId,
+          target: opts.target,
+        },
+      });
+      console.log(
+        `Job Status: ${res.data.state} (Attempts: ${res.data.attempts})`
+      );
     } catch (err) {
-      console.error('Error:', (err as any).message);
+      console.error("Error:", (err as any).message);
     }
   });
 

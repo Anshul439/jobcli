@@ -42,17 +42,13 @@ process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
 
+const queueName = `test-jobs-${AGENT_TARGET}`;
 const worker = new Worker(
-  "test-jobs",
+  queueName,
   async (job) => {
-    if (job.data.target !== AGENT_TARGET) {
-      console.log(
-        `Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`
-      );
-    }
-      console.log(`[${AGENT_TARGET}] Processing job: ${job.id}`);
+    console.log(`[${AGENT_TARGET}] Processing job: ${job.id}`);
 
-    const { org_id, app_version_id, test_path, target } = job.data;
+    const { org_id, app_version_id, test_path } = job.data;
 
     const isInstalled = await redis.sismember(
       "installed_versions",
@@ -79,24 +75,17 @@ worker.on("completed", async (job) => {
     return;
   }
 
-  console.log("HIIIII");
   const { org_id, app_version_id, test_path, target } = job.data;
   const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
   await redis.del(lockKey);
 
   console.log(`[${AGENT_TARGET}] Job ${job.id} completed`);
-  console.log("HIIIII");
 });
 
 worker.on("failed", async (job, err) => {
-  // Only handle events for jobs that match this worker's target
   if (job?.data?.target !== AGENT_TARGET) {
     return;
   }
-
-  console.log("BYEEEE");
-  
-  const { org_id, app_version_id, test_path, target } = job.data;
 
   console.log(`[${AGENT_TARGET}] Job ${job?.id} failed: ${err.message}`);
 });

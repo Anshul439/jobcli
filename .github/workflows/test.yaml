@@ -43,7 +43,7 @@ jobs:
       - name: Submit test via CLI
         id: submit
         run: |
-          JOB_ID=$(node dist/cli/index.js submit --org-id=qualgent --app-version-id=abc123 --test=tests/sample.spec.js | grep -oE '[0-9a-zA-Z-]+$')
+          JOB_ID=$(node dist/cli/index.js submit --org-id=qualgent --app-version-id=abc123 --test=tests/sample.spec.js --target=emulator | grep -oE '[0-9a-zA-Z-]+$')
           echo "Extracted JOB_ID: $JOB_ID"
           echo "job_id=$JOB_ID" >> $GITHUB_OUTPUT
 
@@ -52,7 +52,9 @@ jobs:
           job_id=${{ steps.submit.outputs.job_id }}
           echo "Polling job ID: $job_id"
           for i in {1..10}; do
-          STATUS=$(curl -s http://localhost:3000/status/$job_id | jq -r '.state')
+          RESPONSE=$(curl -s "http://localhost:3000/status?id=$job_id&target=emulator")
+          echo "Attempt $i: Response = $RESPONSE"
+          STATUS=$(echo "$RESPONSE" | jq -r '.state')
           echo "Attempt $i: Job status = $STATUS"
           if [[ "$STATUS" == "completed" ]]; then exit 0; fi
           if [[ "$STATUS" == "failed" ]]; then exit 1; fi

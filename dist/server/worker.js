@@ -44,12 +44,10 @@ const gracefulShutdown = (signal) => __awaiter(void 0, void 0, void 0, function*
 process.on("SIGINT", () => gracefulShutdown("SIGINT"));
 process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
 process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
-const worker = new bullmq_1.Worker("test-jobs", (job) => __awaiter(void 0, void 0, void 0, function* () {
-    if (job.data.target !== AGENT_TARGET) {
-        console.log(`Skipping job ${job.id} — target ${job.data.target} ≠ ${AGENT_TARGET}`);
-    }
+const queueName = `test-jobs-${AGENT_TARGET}`;
+const worker = new bullmq_1.Worker(queueName, (job) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(`[${AGENT_TARGET}] Processing job: ${job.id}`);
-    const { org_id, app_version_id, test_path, target } = job.data;
+    const { org_id, app_version_id, test_path } = job.data;
     const isInstalled = yield redis_1.default.sismember("installed_versions", app_version_id);
     if (!isInstalled) {
         console.log(`[${AGENT_TARGET}] Installing ${app_version_id}`);
@@ -67,20 +65,15 @@ worker.on("completed", (job) => __awaiter(void 0, void 0, void 0, function* () {
     if (job.data.target !== AGENT_TARGET) {
         return;
     }
-    console.log("HIIIII");
     const { org_id, app_version_id, test_path, target } = job.data;
     const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
     yield redis_1.default.del(lockKey);
     console.log(`[${AGENT_TARGET}] Job ${job.id} completed`);
-    console.log("HIIIII");
 }));
 worker.on("failed", (job, err) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    // Only handle events for jobs that match this worker's target
     if (((_a = job === null || job === void 0 ? void 0 : job.data) === null || _a === void 0 ? void 0 : _a.target) !== AGENT_TARGET) {
         return;
     }
-    console.log("BYEEEE");
-    const { org_id, app_version_id, test_path, target } = job.data;
     console.log(`[${AGENT_TARGET}] Job ${job === null || job === void 0 ? void 0 : job.id} failed: ${err.message}`);
 }));

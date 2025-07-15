@@ -7,4 +7,5 @@ export interface SubmitOptions {
 
 export interface StatusOptions {
   jobId: string;
+  target: string;
 }
