@@ -1,4 +1,4 @@
-# Backend Coding Challenge
+# Distributed App Test Infrastructure Simulation
 
 A CLI tool and backend service for queuing, grouping, and deploying AppWright tests across local devices, emulators, and BrowserStack with GitHub Actions integration.
 
@@ -48,8 +48,8 @@ A CLI tool and backend service for queuing, grouping, and deploying AppWright te
 1. **Clone the repository:**
 
 ```bash
-git clone https://github.com/Anshul439/qgjob
-cd cd qgjob
+git clone https://github.com/Anshul439/jobcli
+cd jobcli
 ```
 
 2. **Install dependencies:**
@@ -98,7 +98,7 @@ pnpm worker:browserstack
 ### **Submit a test job**
 
 ```bash
- qgjob submit --org-id=randomorg --app-version-id=xyz3 --test=tests/logout.js --target=emulator
+ jobcli submit --org-id=randomorg --app-version-id=xyz3 --test=tests/logout.js --target=emulator
 ```
 
 ### Parameters
@@ -111,7 +111,7 @@ pnpm worker:browserstack
 ### **Check job status**
 
 ```bash
-qgjob status --job-id=<job-id>
+jobcli status --job-id=<job-id>
 ```
 
 ### API Endpoints
@@ -213,19 +213,19 @@ pnpm worker:browserstack
 
 ```bash
 # Submit jobs for same app version (will group installations)
-qgjob submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
-qgjob submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
+jobcli submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
+jobcli submit --org-id=qualgent --app-version-id=v1.0.0 --test=tests/login.spec.js --target=emulator
 
 # Submit job for different app versions
-qgjob submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=device
-qgjob submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=browserstack
+jobcli submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=device
+jobcli submit --org-id=internal --app-version-id=v2.0.0 --test=tests/checkout.spec.js --target=browserstack
 ```
 
 3. **Monitor progress**
 
 ```bash
 # Check specific job status
-qgjob status --job-id=<job-id>
+jobcli status --job-id=<job-id>
 
 # Monitor queue
 curl http://localhost:3000/monitor/jobs/summary

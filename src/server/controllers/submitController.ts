@@ -19,14 +19,14 @@ export const submitJob = async (req: Request, res: Response) => {
   }
 
   const orgPriorities: Record<string, number> = {
-    qualgent: 1,
+    preferred: 1,
     internal: 2,
-    default: 5,
+    default: 3,
   };
   const effectivePriority = orgPriorities[org_id] || orgPriorities.default;
 
   const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-  const lock = await connection.set(lockKey, "locked", "EX", 30, "NX");
+  const lock = await connection.set(lockKey, "locked", "EX", 3600, "NX");
 
   if (!lock) {
     return res

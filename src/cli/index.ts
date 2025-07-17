@@ -7,8 +7,8 @@ import statusCommand from './commands/status';
 const program = new Command();
 
 program
-  .name('qgjob')
-  .description('QualGent CLI')
+  .name('jobcli')
+  .description('CLI for Submitting and Managing Distributed Jobs')
   .version('1.0.0');
 
 program.addCommand(submitCommand);

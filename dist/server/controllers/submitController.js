@@ -25,13 +25,13 @@ const submitJob = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
     const orgPriorities = {
-        qualgent: 1,
+        preferred: 1,
         internal: 2,
-        default: 5,
+        default: 3,
     };
     const effectivePriority = orgPriorities[org_id] || orgPriorities.default;
     const lockKey = `joblock:${org_id}:${app_version_id}:${test_path}:${target}`;
-    const lock = yield connection.set(lockKey, "locked", "EX", 30, "NX");
+    const lock = yield connection.set(lockKey, "locked", "EX", 3600, "NX");
     if (!lock) {
         return res
             .status(409)

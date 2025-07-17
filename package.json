@@ -1,5 +1,5 @@
 {
-  "name": "qgjob",
+  "name": "jobcli",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -10,7 +10,7 @@
     "worker:device": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=device nodemon dist/server/worker.js\"",
     "worker:emulator": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=emulator nodemon dist/server/worker.js\"",
     "worker:browserstack": "concurrently \"tsc -w\" \"cross-env AGENT_TARGET=browserstack nodemon dist/server/worker.js\"",
-    "redis:reset": "docker exec -it redis-qgjob  redis-cli FLUSHALL"
+    "redis:reset": "docker exec -it redis-jobcli redis-cli FLUSHALL"
   },
   "keywords": [],
   "author": "",
@@ -34,6 +34,6 @@
     "typescript": "^5.8.3"
   },
   "bin": {
-    "qgjob": "./dist/cli/index.js"
+    "jobcli": "./dist/cli/index.js"
   }
 }

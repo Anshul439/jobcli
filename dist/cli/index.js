@@ -9,8 +9,8 @@ const submit_1 = __importDefault(require("./commands/submit"));
 const status_1 = __importDefault(require("./commands/status"));
 const program = new commander_1.Command();
 program
-    .name('qgjob')
-    .description('QualGent CLI')
+    .name('jobcli')
+    .description('CLI for Submitting and Managing Distributed Jobs')
     .version('1.0.0');
 program.addCommand(submit_1.default);
 program.addCommand(status_1.default);
